@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
             if(R_FAILED(res))
                 printf("Something went wrong...\n\n");
             else
-                printf(langData[0] == 0x01 ? "Setting language to English succeeded.\n\nWARNING: Launching System Settings will set\nthe language back to Chinese!\n\nRebooting the console is recommended to apply\nchanges correctly.\n\n" : "Setting language to Chinese succeeded.\n\nRebooting the console is recommended to apply\nchanges correctly.\n\n");
+                printf(langData[0] == 0x01 ? "Setting language to English succeeded.\n\nWARNING: Launching System Settings will set\nthe language back to Chinese!\n\nLaunch the friend list or game notes then exit\nto apply changes!\n\n" : "Setting language to Chinese succeeded.\n\nLaunch the friend list or game notes then exit\nto apply changes!\n\n");
             printf("Press START to exit.\nPress Select to exit + remove application.\n");
             done = true;
         }
