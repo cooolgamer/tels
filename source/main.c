@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
     // Variables
     Result res;
     bool done = false;
-    bool isTaiwan = false;
     uint8_t langData[1];
     u8 regionCode;
 
@@ -43,20 +42,11 @@ int main(int argc, char* argv[])
     printf("Taiwan English Language Setter - v1.0.0\n\n");
 
     CFGU_SecureInfoGetRegion(&regionCode); // check if it's taiwan
-	switch (regionCode)
-	{
-	case 6:
-		isTaiwan = true;
-		break;
-	default:
-		isTaiwan = false;
-
-	}
-
-    if (isTaiwan == false){
+    if (regionCode != 6){
         printf("This program is for Taiwan systems only.\n\nPress Start to exit.");
         done = true;
     }
+    
     // read magic
     res = CFGU_GetConfigInfoBlk2(1, 0xA0002, langData);
     if (R_FAILED(res))
@@ -76,7 +66,7 @@ int main(int argc, char* argv[])
         {
             if (langData[0] == 0x01) // 01 == English have been set, so set it to Chinese.
                 langData[0] = 0x0B;
-            else // Anything else: set the language to Englisg.
+            else // Anything else: set the language to English.
                 langData[0] = 0x01;
             res = CFG_SetConfigInfoBlk8(1, 0xA0002, langData);
             if(R_FAILED(res))
