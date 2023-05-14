@@ -10,7 +10,7 @@ Nintendo left an English language in all Taiwan 3DS systems. For some reasons, i
 
 - Launching system segs will set the language back to Chinese.
 - Not everything is translated but a good part is.
-- After launching it, launch a applet (friend list, game notes etc.) or reboot the console to apply changes.
+- After launching it, launch a applet (friend list, game notes etc.) to apply changes. Rebooting before doing this DO NOT work!
 
 ## Usage
 
