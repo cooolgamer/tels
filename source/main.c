@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <3ds.h>
-#define TITLEID 0x000400000EF10200
+#define TITLEID 0x000400000E111100
 #define SLEEPTIME 5000000000
 
 int main(int argc, char* argv[])
@@ -32,16 +32,33 @@ int main(int argc, char* argv[])
     // Variables
     Result res;
     bool done = false;
-    uint8_t eulaData[4];
+    bool isTaiwan = false;
+    uint8_t langData[1];
+    u8 regionCode;
 
     PrintConsole topScreen;
     consoleInit(GFX_TOP, &topScreen);
     consoleSelect(&topScreen);
 
-    printf("Dead Simple EULA Set - v1.1.0\n\n");
+    printf("Taiwan English Language Setter - v1.0.0\n\n");
 
+    CFGU_SecureInfoGetRegion(&regionCode); // check if it's taiwan
+	switch (regionCode)
+	{
+	case 6:
+		isTaiwan = true;
+		break;
+	default:
+		isTaiwan = false;
+
+	}
+
+    if (isTaiwan == false){
+        printf("This program is for Taiwan systems only.\n\nPress Start to exit.");
+        done = true;
+    }
     // read magic
-    res = CFGU_GetConfigInfoBlk2(4, 0xD0000, eulaData);
+    res = CFGU_GetConfigInfoBlk2(1, 0xA0002, langData);
     if (R_FAILED(res))
     {
         printf("Something weird happened. Couldn't get EULA data.\n\nPress Start to exit.");
@@ -49,7 +66,7 @@ int main(int argc, char* argv[])
     }
 
     if(!done)
-        printf(eulaData[0] == 0xFF && eulaData[1] == 0xFF ? "Press A to unset the 3DS EULAs.\n\n" : "Press A to set the 3DS EULAs.\n\n");
+        printf(langData[0] == 0x01 ? "Press A to set the system language to Chinese.\n\n" : "Press A to set the system language to English.\n\n");
 
     while(aptMainLoop())
     {
@@ -57,15 +74,15 @@ int main(int argc, char* argv[])
         u32 kDown = hidKeysDown();
         if (kDown & KEY_A && !done)
         {
-            if (eulaData[0] == 0xFF && eulaData[1] == 0xFF) // FFFF == EULAs have been set, so unset them.
-                eulaData[0] = eulaData[1] = 0x00;
-            else // Anything else: EULAs have not been set, so set them.
-                eulaData[0] = eulaData[1] = 0xFF;
-            res = CFG_SetConfigInfoBlk8(4, 0xD0000, eulaData);
+            if (langData[0] == 0x01) // 01 == English have been set, so set it to Chinese.
+                langData[0] = 0x0B;
+            else // Anything else: set the language to Englisg.
+                langData[0] = 0x01;
+            res = CFG_SetConfigInfoBlk8(1, 0xA0002, langData);
             if(R_FAILED(res))
                 printf("Something went wrong...\n\n");
             else
-                printf(eulaData[0] == 0xFF ? "Setting the EULA succeeded.\n\n" : "Unsetting the EULA succeeded.\n\n");
+                printf(langData[0] == 0x01 ? "Setting language to English succeeded.\n\nWARNING: Launching System Settings will set\nthe language back to Chinese!\n\nRebooting the console is recommended to apply\nchanges correctly.\n\n" : "Setting language to Chinese succeeded.\n\nRebooting the console is recommended to apply\nchanges correctly.\n\n");
             printf("Press START to exit.\nPress Select to exit + remove application.\n");
             done = true;
         }
@@ -88,7 +105,7 @@ int main(int argc, char* argv[])
                 amInit();
                 res = AM_DeleteAppTitle(MEDIATYPE_SD, (u64)TITLEID);
                 if(R_FAILED(res))
-                    printf("Couldn\'t remove DSES. Try removing it manually through System Settings.\n");
+                    printf("Couldn\'t remove TELS. Try removing it manually through System Settings.\n");
                 else
                     printf(endmsg);
             }
