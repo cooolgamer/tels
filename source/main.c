@@ -16,13 +16,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <3ds.h>
-#define TITLEID 0x000400000E111100
-#define SLEEPTIME 5000000000
 
 int main(int argc, char* argv[])
 {
     // noop call to shut up the compiler
     (void)argc;
+    (void)argv;
 
     // Service initialization
     aptInit();
@@ -39,7 +38,7 @@ int main(int argc, char* argv[])
     consoleInit(GFX_TOP, &topScreen);
     consoleSelect(&topScreen);
 
-    printf("Taiwan English Language Setter - v1.0.0\n\n");
+    printf("Taiwan English Language Setter - v1.1.0\n\n");
 
     CFGU_SecureInfoGetRegion(&regionCode); // check if it's taiwan
     if (regionCode != 6){
@@ -51,7 +50,7 @@ int main(int argc, char* argv[])
     res = CFGU_GetConfigInfoBlk2(1, 0xA0002, langData);
     if (R_FAILED(res))
     {
-        printf("Something weird happened. Couldn't get EULA data.\n\nPress Start to exit.");
+        printf("Something weird happened.\nCouldn't get language data.\n\nPress Start to exit.");
         done = true;
     }
 
@@ -71,36 +70,15 @@ int main(int argc, char* argv[])
             res = CFG_SetConfigInfoBlk8(1, 0xA0002, langData);
             if(R_FAILED(res))
                 printf("Something went wrong...\n\n");
-            else
-                printf(langData[0] == 0x01 ? "Setting language to English succeeded.\n\nWARNING: Launching System Settings will set\nthe language back to Chinese!\n\nLaunch the friend list or game notes then exit\nto apply changes!\n\n" : "Setting language to Chinese succeeded.\n\nLaunch the friend list or game notes then exit\nto apply changes!\n\n");
-            printf("Press START to exit.\nPress Select to exit + remove application.\n");
-            done = true;
+            else{
+                printf(langData[0] == 0x01 ? "Setting language to English succeeded.\n\nWARNING: Launching System Settings will set\nthe language back to Chinese!\n\n" : "Setting language to Chinese succeeded.\n\n");
+                printf("NOTE: Launch the friend list or game notes\nthen exit to apply changes!\n\nPress START to exit.\n\n");
+                done = true;
+            }
         }
         if (kDown & KEY_START)
         {
             printf("Exiting...\n");
-            break;
-        }
-        if (kDown & KEY_SELECT) 
-        {
-            char* endmsg = "Successfully removed application.\n";
-            printf("Removing application and exiting...\n");
-            if (envIsHomebrew())
-            {
-                remove(argv[0]);
-                printf(endmsg);
-            }
-            else 
-            {
-                amInit();
-                res = AM_DeleteAppTitle(MEDIATYPE_SD, (u64)TITLEID);
-                if(R_FAILED(res))
-                    printf("Couldn\'t remove TELS. Try removing it manually through System Settings.\n");
-                else
-                    printf(endmsg);
-            }
-            amExit();
-            svcSleepThread(SLEEPTIME);
             break;
         }
     }
